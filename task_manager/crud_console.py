@@ -32,6 +32,21 @@ def show_tasks():
         print(f"{num:>3}) {sign} {name}  ({status})")
 
 
+def new_task():
+    name = input("Что нужно сделать: ").strip()
+    if not name:
+        print("Название пустое, задача не добавлена.")
+        return
+
+    link = open_db()
+    cur = link.cursor()
+    cur.execute("INSERT INTO tasks (title) VALUES (?)", (name,))
+    link.commit()
+    new_num = cur.lastrowid
+    link.close()
+    print(f"Задача добавлена, номер {new_num}.")
+
+
 def run():
     while True:
         print_menu()
