@@ -71,6 +71,32 @@ def finish_task():
         print(f"Задача {num} отмечена выполненной.")
 
 
+def remove_task():
+    show_tasks()
+    text = input("Номер задачи для удаления: ").strip()
+    if not text.isdigit():
+        print("Нужно ввести число.")
+        return
+
+    num = int(text)
+    answer = input(f"Удалить задачу {num}? (y/n): ").strip().lower()
+    if answer != 'y':
+        print("Удаление отменено.")
+        return
+
+    link = open_db()
+    cur = link.cursor()
+    cur.execute("DELETE FROM tasks WHERE id = ?", (num,))
+    link.commit()
+    changed = cur.rowcount
+    link.close()
+
+    if changed == 0:
+        print(f"Задачи с таким номером нет ({num}).")
+    else:
+        print(f"Задача {num} удалена.")
+
+
 def run():
     while True:
         print_menu()
