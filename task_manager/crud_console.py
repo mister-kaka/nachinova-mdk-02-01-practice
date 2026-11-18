@@ -6,12 +6,30 @@ def open_db():
 
 
 def print_menu():
-    print("\nМои задачи")
+    print("\n--- Мои задачи ---")
     print("1 - показать список")
     print("2 - новая задача")
     print("3 - отметить выполненной")
     print("4 - удалить задачу")
     print("0 - выйти")
+
+
+def show_tasks():
+    link = open_db()
+    cur = link.cursor()
+    cur.execute("SELECT id, title, status FROM tasks ORDER BY id")
+    all_rows = cur.fetchall()
+    link.close()
+
+    if not all_rows:
+        print("Список пуст, добавьте первую задачу.")
+        return
+
+    print("\nСписок задач:")
+    for line in all_rows:
+        num, name, status = line
+        sign = "[x]" if status == 'done' else "[ ]"
+        print(f"{num:>3}) {sign} {name}  ({status})")
 
 
 def run():
