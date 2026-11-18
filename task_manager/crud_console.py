@@ -47,6 +47,30 @@ def new_task():
     print(f"Задача добавлена, номер {new_num}.")
 
 
+def finish_task():
+    show_tasks()
+    text = input("Номер выполненной задачи: ").strip()
+    if not text.isdigit():
+        print("Нужно ввести число.")
+        return
+
+    num = int(text)
+    link = open_db()
+    cur = link.cursor()
+    cur.execute(
+        "UPDATE tasks SET status = 'done' WHERE id = ?",
+        (num,)
+    )
+    link.commit()
+    changed = cur.rowcount
+    link.close()
+
+    if changed == 0:
+        print(f"Задачи с таким номером нет ({num}).")
+    else:
+        print(f"Задача {num} отмечена выполненной.")
+
+
 def run():
     while True:
         print_menu()
