@@ -308,7 +308,110 @@
             border-left: 3px solid var(--krasnyj2);
         }
 
-        /* телефон */
+        li {
+            grid-template-columns: 44px 36px minmax(0, 1fr) auto 44px;
+            position: relative;
+        }
+
+        li form {
+            margin: 0;
+        }
+
+        .galka {
+            width: 44px;
+            height: 44px;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            padding: 0;
+        }
+
+        .galka i {
+            width: 22px;
+            height: 22px;
+            border: 1.5px solid var(--seryj);
+            display: grid;
+            place-items: center;
+            font-style: normal;
+            font-size: 13px;
+            line-height: 1;
+            color: transparent;
+        }
+
+        .galka:hover i {
+            border-color: var(--text);
+            color: var(--seryj);
+        }
+
+        li.done .galka i {
+            background: var(--krasnyj);
+            border-color: var(--krasnyj);
+            color: var(--text);
+        }
+
+        details summary {
+            list-style: none;
+            width: 44px;
+            height: 44px;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            color: var(--seryj);
+            font-size: 17px;
+        }
+
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details summary:hover, details[open] summary {
+            color: var(--krasnyj2);
+        }
+
+        .vopros {
+            position: absolute;
+            right: 44px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 3;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--fon);
+            border: 1px solid var(--krasnyj2);
+            padding: 6px 6px 6px 14px;
+            white-space: nowrap;
+            font-size: 13.5px;
+        }
+
+        .vopros button {
+            border: 0;
+            background: var(--krasnyj);
+            color: var(--text);
+            height: 32px;
+            padding: 0 14px;
+            cursor: pointer;
+            font: 500 11px var(--osnova);
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+
+        .vopros button:hover {
+            background: var(--krasnyj2);
+        }
+
+        .vopros small {
+            color: var(--seryj);
+        }
+
+        summary.zagolovok-gruppy {
+            list-style: none;
+            cursor: pointer;
+        }
+
         @media (max-width: 760px) {
             .app {
                 display: block;
@@ -373,6 +476,25 @@
                 display: none;
             }
         }
+
+        @media (max-width: 760px) {
+            li {
+                grid-template-columns: 38px 30px minmax(0, 1fr) auto 38px;
+            }
+
+            .vopros small {
+                display: none;
+            }
+
+            .vopros {
+                right: 36px;
+            }
+
+            .status {
+                font-size: 9.5px;
+                padding: 3px 6px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -405,22 +527,61 @@
             <div class="oshibka">{{ warning }}</div>
         {% endif %}
 
-        <h2>Задачи <small>{{ todo_list | length }}</small></h2>
-        {% if todo_list %}
-            <ul>
-                {% for t in todo_list %}
-                    <li class="{% if t.status == 'done' %}done{% endif %}">
-                        <span class="nomer">#{{ t.id }}</span>
-                        <span class="nazvanie">{{ t.title }}</span>
-                        <span class="status">{% if t.status == 'done' %}выполнено{% else %}в работе{% endif %}</span>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
+        {% if not todo_list %}
+            <h2>Задачи <small>0</small></h2>
             <div class="pusto">
                 <h3>Список пуст</h3>
                 <p>Впишите первую задачу в поле выше и нажмите Enter.</p>
             </div>
+        {% else %}
+            <h2>В работе <small>{{ todo_list | length - gotovo }}</small></h2>
+            {% if gotovo == todo_list | length %}
+                <div class="pusto"><p>Всё выполнено. Новые задачи появятся здесь.</p></div>
+            {% endif %}
+            <ul>
+                {% for t in todo_list if t.status != 'done' %}
+                    <li class="{% if t.status == 'done' %}done{% endif %}">
+                        <form method="POST" action="{{ url_for('switch_done', num=t.id) }}">
+                            <button class="galka" type="submit" title="{% if t.status == 'done' %}Вернуть в работу{% else %}Отметить выполненной{% endif %}"><i>✓</i></button>
+                        </form>
+                        <span class="nomer">#{{ t.id }}</span>
+                        <span class="nazvanie">{{ t.title }}</span>
+                        <span class="status">{% if t.status == 'done' %}выполнено{% else %}в работе{% endif %}</span>
+                        <details>
+                            <summary title="Удалить">🗑</summary>
+                            <form class="vopros" method="POST" action="{{ url_for('remove_task', num=t.id) }}">
+                                Удалить задачу #{{ t.id }}?
+                                <button type="submit">Удалить</button>
+                                <small>или ещё раз на корзину - отмена</small>
+                            </form>
+                        </details>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            {% if gotovo %}
+                <h2>Выполнено <small>{{ gotovo }}</small></h2>
+                <ul>
+                    {% for t in todo_list if t.status == 'done' %}
+                        <li class="{% if t.status == 'done' %}done{% endif %}">
+                        <form method="POST" action="{{ url_for('switch_done', num=t.id) }}">
+                            <button class="galka" type="submit" title="{% if t.status == 'done' %}Вернуть в работу{% else %}Отметить выполненной{% endif %}"><i>✓</i></button>
+                        </form>
+                        <span class="nomer">#{{ t.id }}</span>
+                        <span class="nazvanie">{{ t.title }}</span>
+                        <span class="status">{% if t.status == 'done' %}выполнено{% else %}в работе{% endif %}</span>
+                        <details>
+                            <summary title="Удалить">🗑</summary>
+                            <form class="vopros" method="POST" action="{{ url_for('remove_task', num=t.id) }}">
+                                Удалить задачу #{{ t.id }}?
+                                <button type="submit">Удалить</button>
+                                <small>или ещё раз на корзину - отмена</small>
+                            </form>
+                        </details>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         {% endif %}
     </main>
     </div>
