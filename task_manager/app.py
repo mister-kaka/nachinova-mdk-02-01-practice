@@ -34,10 +34,20 @@ def main_page():
             )
 
         link = open_db()
-        cur = link.cursor()
-        cur.execute("INSERT INTO tasks (title) VALUES (?)", (name,))
-        link.commit()
-        link.close()
+        try:
+            cur = link.cursor()
+            cur.execute("INSERT INTO tasks (title) VALUES (?)", (name,))
+            link.commit()
+        except sqlite3.Error as err:
+            link.rollback()
+            print('[DB ERROR] запись:', err)
+            return render_template(
+                'index.html',
+                todo_list=read_tasks(),
+                warning='Задача не сохранилась из-за ошибки базы, попробуйте ещё раз.'
+            )
+        finally:
+            link.close()
 
         return redirect(url_for('main_page'))
 
