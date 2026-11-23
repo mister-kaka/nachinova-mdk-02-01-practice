@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 
 site = Flask(__name__)
 
@@ -12,21 +12,37 @@ def open_db():
     return link
 
 
-@site.route('/')
-def main_page():
-    # подключаемся к базе
+def read_tasks():
     link = open_db()
     cur = link.cursor()
-
-    # читаем все задачи
     cur.execute("SELECT id, title, status FROM tasks ORDER BY id")
     all_rows = cur.fetchall()
-
     link.close()
+    return all_rows
 
-    return render_template('index.html', todo_list=all_rows)
+
+@site.route('/', methods=['GET', 'POST'])
+def main_page():
+    if request.method == 'POST':
+        name = request.form.get('title', '').strip()
+
+        if not name:
+            return render_template(
+                'index.html',
+                todo_list=read_tasks(),
+                warning='Введите название задачи, пустое поле не принимается.'
+            )
+
+        link = open_db()
+        cur = link.cursor()
+        cur.execute("INSERT INTO tasks (title) VALUES (?)", (name,))
+        link.commit()
+        link.close()
+
+        return redirect(url_for('main_page'))
+
+    return render_template('index.html', todo_list=read_tasks())
 
 
 if __name__ == '__main__':
     site.run(debug=True, port=5000)
-
