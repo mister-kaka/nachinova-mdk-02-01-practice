@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Мои дела</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Golos+Text:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --fon: #141313;
+            --panel: #1b1a19;
+            --text: #eee9e1;
+            --seryj: #8f8a84;
+            --temno: #45413e;
+            --liniya: rgba(238, 233, 225, .10);
+            --krasnyj: #7a0f14;
+            --krasnyj2: #a3161d;
+            --zagolovok: "Dela Gothic One", Impact, sans-serif;
+            --osnova: "Golos Text", "Segoe UI", sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            height: 100%;
+        }
+
+        body {
+            background: var(--fon);
+            color: var(--text);
+            font: 400 15px var(--osnova);
+        }
+
+        h1, h2, h3 {
+            font-family: var(--zagolovok);
+            font-weight: 400;
+            margin: 0;
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 270px minmax(0, 1fr);
+            height: 100vh;
+        }
+
+        aside {
+            position: relative;
+            background: var(--panel);
+            border-right: 1px solid var(--liniya);
+            padding: 26px 24px;
+            overflow: hidden;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font: 20px var(--zagolovok);
+        }
+
+        .logo i {
+            width: 28px;
+            height: 28px;
+            background: var(--krasnyj);
+            display: grid;
+            place-items: center;
+            font-style: normal;
+            font-size: 14px;
+        }
+
+        .itog {
+            margin-top: 40px;
+        }
+
+        .itog b {
+            font: 44px/1 var(--zagolovok);
+            font-weight: 400;
+        }
+
+        .itog b span {
+            color: var(--temno);
+        }
+
+        .itog p {
+            margin: 8px 0 0;
+            font-size: 11px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--seryj);
+        }
+
+        .polosa {
+            margin-top: 14px;
+            height: 3px;
+            background: var(--temno);
+        }
+
+        .polosa div {
+            height: 100%;
+            background: var(--krasnyj2);
+        }
+
+        .chasy {
+            position: absolute;
+            left: 50%;
+            bottom: -50px;
+            width: 250px;
+            margin-left: -110px;
+            pointer-events: none;
+        }
+
+        main {
+            overflow-y: auto;
+            padding: 30px 48px 40px;
+        }
+
+        .verh h1 {
+            font-size: 52px;
+            line-height: 1;
+        }
+
+        .verh p {
+            margin: 12px 0 0;
+            color: var(--seryj);
+        }
+
+        .verh p b {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-top: 34px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--liniya);
+        }
+
+        h2 small {
+            font: 400 13px var(--osnova);
+            color: var(--seryj);
+            margin-left: 8px;
+        }
+
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        li {
+            display: grid;
+            grid-template-columns: 44px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 4px;
+            min-height: 58px;
+            border-bottom: 1px solid var(--liniya);
+        }
+
+        .nomer {
+            font-size: 12px;
+            color: var(--seryj);
+        }
+
+        .nazvanie {
+            font-size: 16px;
+            line-height: 1.35;
+            padding: 13px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .status {
+            font-size: 10.5px;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            padding: 4px 8px;
+            border: 1px solid var(--temno);
+            color: var(--seryj);
+            white-space: nowrap;
+        }
+
+        li.done .nazvanie {
+            color: var(--seryj);
+            text-decoration: line-through;
+            text-decoration-color: var(--krasnyj2);
+            text-decoration-thickness: 1.5px;
+        }
+
+        li.done .status {
+            background: var(--krasnyj);
+            border-color: var(--krasnyj);
+            color: var(--text);
+        }
+
+        .pusto {
+            padding: 50px 0;
+            text-align: center;
+            border-bottom: 1px solid var(--liniya);
+        }
+
+        .pusto h3 {
+            font-size: 34px;
+        }
+
+        .pusto p {
+            color: var(--seryj);
+            margin: 12px 0 0;
+        }
+
+        @media (max-width: 760px) {
+            .app {
+                display: block;
+                height: auto;
+            }
+
+            aside {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 14px 16px;
+                border-right: 0;
+                border-bottom: 1px solid var(--liniya);
+            }
+
+            .itog {
+                margin: 0;
+                display: flex;
+                align-items: baseline;
+                gap: 8px;
+            }
+
+            .itog b {
+                font-size: 22px;
+            }
+
+            .itog p {
+                margin: 0;
+            }
+
+            .polosa, .chasy {
+                display: none;
+            }
+
+            main {
+                padding: 20px 16px 30px;
+            }
+
+            .verh h1 {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+    <aside>
+        <div class="logo"><i>✦</i> Дела</div>
+        <div class="itog">
+            {% set gotovo = todo_list | selectattr('status', 'equalto', 'done') | list | length %}
+            <b>{{ gotovo }}<span>/{{ todo_list | length }}</span></b>
+            <p>выполнено</p>
+            {% if todo_list %}
+            <div class="polosa"><div style="width: {{ gotovo * 100 // (todo_list | length) }}%"></div></div>
+            {% endif %}
+        </div>
+        <img class="chasy" src="{{ url_for('static', filename='hourglass.webp') }}" alt="">
+    </aside>
+    <main>
+        <div class="verh">
+            <h1>Мои дела</h1>
+            <p><b>{{ todo_list | length - gotovo }}</b> в работе · <b>{{ gotovo }}</b> выполнено</p>
+        </div>
+
+        <h2>Задачи <small>{{ todo_list | length }}</small></h2>
+        {% if todo_list %}
+            <ul>
+                {% for t in todo_list %}
+                    <li class="{% if t.status == 'done' %}done{% endif %}">
+                        <span class="nomer">#{{ t.id }}</span>
+                        <span class="nazvanie">{{ t.title }}</span>
+                        <span class="status">{% if t.status == 'done' %}выполнено{% else %}в работе{% endif %}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="pusto">
+                <h3>Список пуст</h3>
+                <p>Добавьте задачу через консольное приложение.</p>
+            </div>
+        {% endif %}
+    </main>
+    </div>
+</body>
+</html>
