@@ -14,11 +14,15 @@ def open_db():
 
 def read_tasks():
     link = open_db()
-    cur = link.cursor()
-    cur.execute("SELECT id, title, status FROM tasks ORDER BY id")
-    all_rows = cur.fetchall()
-    link.close()
-    return all_rows
+    try:
+        cur = link.cursor()
+        cur.execute("SELECT id, title, status FROM tasks ORDER BY id")
+        return cur.fetchall()
+    except sqlite3.Error as err:
+        print('[DB ERROR] чтение:', err)
+        return []
+    finally:
+        link.close()
 
 
 @site.route('/', methods=['GET', 'POST'])
