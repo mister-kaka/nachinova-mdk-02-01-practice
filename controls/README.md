@@ -8,6 +8,6 @@
 
 Сейчас в папке:
 
-- `bash_control` - проверочная работа по bash
-- `control_attestation` - итоговая проверочная работа
-- `control_test` - контрольная по веб-приложениям на Python, SQLite и Flask
+- [`bash_control`](bash_control/) - проверочная работа по bash
+- [`control_attestation`](control_attestation/) - итоговая проверочная работа
+- [`control_test`](control_test/) - контрольная по веб-приложениям на Python, SQLite и Flask
