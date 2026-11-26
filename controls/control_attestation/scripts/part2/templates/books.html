@@ -1,0 +1,11 @@
+<!doctype html>
+<html>
+<body>
+{% if error %}<p>{{ error }}</p>{% endif %}
+<ul>
+{% for b in books %}
+  <li>{{ b[0] }} {{ b[1] }} {{ b[2] }} {{ b[3] }}</li>
+{% endfor %}
+</ul>
+</body>
+</html>

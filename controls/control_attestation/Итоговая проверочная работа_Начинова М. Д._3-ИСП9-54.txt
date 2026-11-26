@@ -1,0 +1,786 @@
+Начинова Мария Д.
+Группа: 3-ИСП9-54
+Специальность: 09.02.07
+Предмет: МДК 02.01 Технология и инструментальные средства разработки ПО
+Дата: 26.11.2026
+
+ЧАСТЬ I
+
+Часть A. Тест
+
+Блок A1. Списки Python
+
+1. Что вернёт len([1, [2, 3], [], 4])?
+б) 4
+
+2. b = a[:]; b.append(4); print(a) при a = [1, 2, 3]
+б) [1, 2, 3]
+
+3. Что вернёт [1, 2, 3, 4, 5][2:-1]?
+а) [3, 4]
+
+4. Что делает lst.sort(reverse=True)?
+б) Сортирует список на месте по убыванию, возвращает None
+
+5. Что вернёт [1, 2, 3].index(2)?
+б) 1
+
+Блок A2. SQLite и транзакции
+
+6. Если после INSERT не вызвать conn.commit() и закрыть соединение?
+б) Данные не будут записаны на диск
+
+7. Какой запрос защищён от SQL-инъекции?
+б) cursor.execute("SELECT * FROM t WHERE id = ?", (id,))
+
+8. Что делает conn.rollback()?
+б) Отменяет текущую транзакцию
+
+9. cursor.rowcount после DELETE FROM t WHERE id = 999, если такой строки нет?
+б) 0
+
+10. Зачем нужен sqlite3.Row?
+б) Чтобы обращаться к полям результата по имени: row['title']
+
+Блок A3. Flask
+
+11. Что делает декоратор @app.route('/')?
+б) Связывает URL / с функцией-обработчиком
+
+12. POST на маршрут, объявленный без methods=['POST']?
+в) Вернётся 405 Method Not Allowed
+
+13. Где по умолчанию Flask ищет HTML-шаблоны?
+в) В папке templates/
+
+14. Зачем redirect(url_for('index')) после успешного POST?
+б) Для защиты от дублирования при F5 (PRG-паттерн)
+
+15. Что вернёт url_for('index'), если маршрут '/'?
+б) '/'
+
+16. Что делает request.form.get('title', '')?
+б) Возвращает значение поля title или пустую строку, если поля нет
+
+Блок A4. Связки и типичные ошибки
+
+17. f делает lst.append(1), a = [], f(a), print(a)
+б) [1]
+
+18. y = x; y[0] = 100; print(x) при x = [1, 2, 3]
+б) [100, 2, 3]
+
+19. lst = [1, 2, 3]; lst[5] = 10
+в) IndexError
+
+20. Список лямбд lambda: i в цикле range(3)
+б) [2, 2, 2]
+
+
+Часть B. Что выведет код
+
+Задание 21
+[1, 2, 3, 4, 5]
+[100, 3, 4]
+
+
+Задание 22
+None
+[1, 2, 3]
+
+
+Задание 23
+[1, 2, 3]
+[1, 2]
+
+
+Задание 24
+[1, 2, 3]
+[1, 2, 3]
+
+
+Задание 25
+[1, 2, 3]
+[1, 2, 3, 99]
+
+
+Задание 26
+{'a': 1, 'b': 2}
+[('x', 100), ('b', 2)]
+
+
+Задание 27
+[[100, 2], [3, 4]]
+[[100, 2], [3, 4]]
+
+
+Задание 28
+[2, 4, 6]
+[4, 16, 36]
+
+
+
+Часть C. Дописать код
+
+Задание 29. Функция поиска минимума
+1. numbers[0]
+2. minimum
+3. n
+4. minimum
+
+def find_min(numbers):
+    """Возвращает минимальное число в списке. Список не пустой."""
+    if not numbers:
+        return None
+    minimum = numbers[0]
+    for n in numbers:
+        if n < minimum:
+            minimum = n
+    return minimum
+
+
+Задание 30. Функция удаления по значению
+1. len(lst)
+2. pop(i)
+3. После pop(i) следующий элемент сдвигается на индекс i. Если увеличить i, этот элемент будет пропущен.
+4. 1
+
+def remove_all(lst, value):
+    """Удаляет ВСЕ вхождения value из lst. Изменяет lst на месте."""
+    i = 0
+    while i < len(lst):
+        if lst[i] == value:
+            lst.pop(i)
+        else:
+            i += 1
+
+
+Задание 31. Функция работы с БД
+1. sqlite3.Row
+2. ?
+3. fetchall()
+4. conn.close()
+В except в файле есть ещё один пропуск без номера. Туда пишется [], пустой список.
+
+def get_done_tasks():
+    """Возвращает список названий задач со статусом 'done'."""
+    conn = sqlite3.connect("app.db")
+    conn.row_factory = sqlite3.Row
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT title FROM tasks WHERE status = ?", ("done",))
+        return [row["title"] for row in cursor.fetchall()]
+    except sqlite3.Error as e:
+        print(f"[DB ERROR] {e}")
+        return []
+    finally:
+        conn.close()
+
+
+Задание 32. Маршрут Flask
+1. ['GET', 'POST']
+2. commit()
+3. rollback()
+4. redirect(url_for('index'))
+
+from flask import Flask, render_template, request, redirect, url_for
+import sqlite3
+
+app = Flask(__name__)
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        title = request.form.get('title', '').strip()
+        if not title:
+            return render_template('index.html', items=[], error='Пусто!')
+
+        conn = sqlite3.connect('app.db')
+        try:
+            cursor = conn.cursor()
+            cursor.execute('INSERT INTO tasks (title) VALUES (?)', (title,))
+            conn.commit()
+        except sqlite3.Error as e:
+            conn.rollback()
+            return render_template('index.html', items=[], error=str(e))
+        finally:
+            conn.close()
+
+        return redirect(url_for('index'))
+
+    return render_template('index.html', items=[])
+
+
+Задание 33. Обработка ошибок
+1. commit()
+2. Error
+3. rollback()
+4. True после commit, False после rollback
+
+def safe_insert(title):
+    """Вставляет задачу. При ошибке - откат и возврат False."""
+    conn = sqlite3.connect("app.db")
+    try:
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO tasks (title) VALUES (?)", (title,))
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        conn.rollback()
+        print(f"[DB ERROR] {e}")
+        return False
+    finally:
+        conn.close()
+
+
+Часть D. Самостоятельные задачи
+
+Задание 34. Списки: пересечение двух списков
+def intersection(a, b):
+    result = []
+    for x in a:
+        if x in b and x not in result:
+            result.append(x)
+    return result
+
+
+Задание 35. Списки: сглаживание вложенного списка
+def flatten(lst):
+    result = []
+    for x in lst:
+        if type(x) == list:
+            for n in x:
+                result.append(n)
+        else:
+            result.append(x)
+    return result
+
+
+Задание 36. Списки: группировка по чётности
+def group_by_parity(numbers):
+    result = {'even': [], 'odd': []}
+    for n in numbers:
+        if n % 2 == 0:
+            result['even'].append(n)
+        else:
+            result['odd'].append(n)
+    return result
+
+
+Задание 37. SQLite: CRUD-функция
+import sqlite3
+
+DB_PATH = 'students.db'
+
+def add_student(name, grade):
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO students (name, grade) VALUES (?, ?)', (name, grade))
+        conn.commit()
+        return True
+    except sqlite3.Error:
+        conn.rollback()
+        return False
+    finally:
+        conn.close()
+
+def get_all_students():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    try:
+        cursor = conn.cursor()
+        cursor.execute('SELECT id, name, grade FROM students')
+        result = []
+        for row in cursor.fetchall():
+            result.append((row['id'], row['name'], row['grade']))
+        return result
+    except sqlite3.Error:
+        conn.rollback()
+        return []
+    finally:
+        conn.close()
+
+def update_grade(student_id, new_grade):
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        cursor = conn.cursor()
+        cursor.execute('UPDATE students SET grade = ? WHERE id = ?', (new_grade, student_id))
+        conn.commit()
+        return cursor.rowcount
+    except sqlite3.Error:
+        conn.rollback()
+        return 0
+    finally:
+        conn.close()
+
+def delete_failing():
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM students WHERE grade < ?', (3,))
+        conn.commit()
+        return cursor.rowcount
+    except sqlite3.Error:
+        conn.rollback()
+        return 0
+    finally:
+        conn.close()
+
+
+Задание 38. Flask: полный маршрут «Добавить + Показать»
+from flask import Flask, render_template, request, redirect, url_for
+import sqlite3
+
+app = Flask(__name__)
+DB_PATH = 'students.db'
+
+@app.route('/students', methods=['GET', 'POST'])
+def students():
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        grade_text = request.form.get('grade', '').strip()
+        if name == '':
+            return render_template('students.html', students=[], error='Имя не может быть пустым')
+        try:
+            grade = int(grade_text)
+        except ValueError:
+            return render_template('students.html', students=[], error='Оценка должна быть целым числом от 1 до 5')
+        if grade < 1 or grade > 5:
+            return render_template('students.html', students=[], error='Оценка должна быть целым числом от 1 до 5')
+        conn = sqlite3.connect(DB_PATH)
+        try:
+            cursor = conn.cursor()
+            cursor.execute('INSERT INTO students (name, grade) VALUES (?, ?)', (name, grade))
+            conn.commit()
+        except sqlite3.Error as e:
+            conn.rollback()
+            return render_template('students.html', students=[], error=str(e))
+        finally:
+            conn.close()
+        return redirect(url_for('students'))
+
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        cursor = conn.cursor()
+        cursor.execute('SELECT id, name, grade FROM students')
+        rows = cursor.fetchall()
+    except sqlite3.Error as e:
+        conn.rollback()
+        return render_template('students.html', students=[], error=str(e))
+    finally:
+        conn.close()
+    return render_template('students.html', students=rows)
+
+
+Задание 39. Комплексная задача: «Топ-3 студента»
+def top_three_by_grade(students):
+    top = []
+    for name, grade in students:
+        i = 0
+        while i < len(top) and top[i][1] >= grade:
+            i += 1
+        if i < 3:
+            top.insert(i, (name, grade))
+            if len(top) > 3:
+                top.pop()
+    result = []
+    for name, grade in top:
+        result.append(name)
+    return result
+
+
+ЧАСТЬ II
+
+Часть A. Тест
+
+Блок A1. Словари и кортежи
+
+1. Что вернёт len({'a': 1, 'b': 2, 'c': 3})?
+а) 3
+
+2. d = {'a': 1}; d['b'] = 2; print(d)
+б) {'a': 1, 'b': 2}
+
+3. Что вернёт {'a': 1}.get('b', 0)?
+б) 0
+
+4. t = (1, 2, 3); t[0] = 100
+б) TypeError - кортеж неизменяем
+
+5. Что вернёт tuple([1, 2, 3])?
+б) (1, 2, 3)
+
+6. Что вернёт len((1,))?
+б) 1
+
+7. Что делает d.keys()?
+б) Возвращает представление ключей, по которому можно итерироваться
+
+8. Как проверить, есть ли ключ 'a' в словаре d?
+б) 'a' in d
+
+Блок A2. Множества
+
+9. Что вернёт len({1, 2, 2, 3, 3, 3})?
+б) 3
+
+10. Что вернёт {1, 2, 3} & {2, 3, 4}?
+б) {2, 3}
+
+11. Что вернёт {1, 2, 3} | {3, 4}?
+б) {1, 2, 3, 4}
+
+12. Что вернёт {1, 2, 3} - {2}?
+а) {1, 3}
+
+13. s.add([4, 5]) для множества
+б) TypeError - список не хешируемый
+
+Блок A3. SQLite и Flask
+
+14. Какой запрос защищён от SQL-инъекции?
+б) cursor.execute("SELECT * FROM t WHERE name = ?", (name,))
+
+15. Что делает conn.rollback()?
+б) Отменяет текущую транзакцию
+
+16. cursor.rowcount после UPDATE, если строки нет?
+б) 0
+
+17. Что делает @app.route('/item/<int:item_id>')?
+б) Связывает URL /item/5 с функцией, где item_id = 5
+
+18. POST на маршрут без methods=['POST']?
+в) Вернётся 405 Method Not Allowed
+
+19. Что вернёт url_for('index'), если маршрут '/'?
+б) '/'
+
+20. for key in d: print(key) при d = {1: 'a', 2: 'b'}
+а) 1, 2
+
+Точная печать задания 20:
+1
+2
+
+
+Часть B. Что выведет код
+
+Задание 21
+{'a': 100, 'b': 2, 'c': 3}
+3
+
+
+Задание 22
+1
+2
+3
+
+
+Задание 23
+{'x': 1, 'y': 2}
+['z', 'y']
+
+
+Задание 24
+{'a': 1, 'new': 'value'}
+
+
+Задание 25
+{1, 2, 3, 4}
+4
+
+
+Задание 26
+{1, 2, 3, 4}
+True
+
+
+Задание 27
+([1, 2, 99], [3, 4])
+
+
+Задание 28
+{'apple': 3, 'banana': 2, 'cherry': 1}
+
+
+
+Часть C. Дописать код
+
+Задание 29. Частотный словарь
+1. continue
+2. get(ch, 0)
+3. result
+
+def count_chars(text):
+    """Возвращает словарь: символ -> количество вхождений. Пробелы игнорируются."""
+    result = {}
+    for ch in text:
+        if ch == " ":
+            continue
+        result[ch] = result.get(ch, 0) + 1
+    return result
+
+
+Задание 30. Инверсия словаря
+1. items()
+2. []
+3. append
+
+def invert_dict(d):
+    """Меняет местами ключи и значения. Если значений несколько - собирает список ключей."""
+    result = {}
+    for key, value in d.items():
+        if value not in result:
+            result[value] = []
+        result[value].append(key)
+    return result
+
+
+Задание 31. SQLite: безопасное обновление
+1. ? (плейсхолдер для цены)
+2. ? (плейсхолдер для id)
+Кортеж аргументов в файле уже стоит в нужном порядке: (new_price, product_id).
+3. commit()
+4. rollback()
+
+def update_price(product_id, new_price):
+    """Обновляет цену. Возвращает rowcount. При ошибке - rollback и 0."""
+    conn = sqlite3.connect("shop.db")
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE products SET price = ? WHERE id = ?",
+            (new_price, product_id),
+        )
+        conn.commit()
+        return cursor.rowcount
+    except sqlite3.Error as e:
+        conn.rollback()
+        print(f"[DB ERROR] {e}")
+        return 0
+    finally:
+        conn.close()
+
+
+Задание 32. Flask: маршрут удаления
+1. ['POST']
+2. rowcount
+3. redirect(url_for('index'))
+Функция главной страницы в этом пропуске названа index. Если на бланке она названа иначе, в url_for пишется её имя.
+
+from flask import Flask, render_template, redirect, url_for
+import sqlite3
+
+app = Flask(__name__)
+
+@app.route('/delete/<int:item_id>', methods=['POST'])
+def delete_item(item_id):
+    conn = sqlite3.connect('shop.db')
+    try:
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM items WHERE id = ?', (item_id,))
+        conn.commit()
+        affected = cursor.rowcount
+    except sqlite3.Error as e:
+        conn.rollback()
+        affected = 0
+    finally:
+        conn.close()
+
+    if affected == 0:
+        return render_template('index.html', items=[], error='Не найдено')
+    return redirect(url_for('index'))
+
+
+Задание 33. Обработка POST-формы
+1. get
+2. not name
+3. rollback()
+4. url_for('index')
+
+from flask import Flask, render_template, request, redirect, url_for
+import sqlite3
+
+app = Flask(__name__)
+
+@app.route('/add', methods=['GET', 'POST'])
+def add():
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        if not name:
+            return render_template('add.html', error='Поле обязательно')
+
+        conn = sqlite3.connect('shop.db')
+        try:
+            cursor = conn.cursor()
+            cursor.execute('INSERT INTO items (name) VALUES (?)', (name,))
+            conn.commit()
+        except sqlite3.Error as e:
+            conn.rollback()
+            return render_template('add.html', error=str(e))
+        finally:
+            conn.close()
+
+        return redirect(url_for('index'))
+    return render_template('add.html')
+
+
+Часть D. Самостоятельные задачи
+
+Задание 34. Словари: группировка по первой букве
+def group_by_first_letter(words):
+    result = {}
+    for word in words:
+        letter = word[0]
+        if letter not in result:
+            result[letter] = []
+        result[letter].append(word)
+    return result
+
+
+Задание 35. Кортежи: подсчёт статистики
+def stats(students):
+    if len(students) == 0:
+        return (None, None, None)
+    min_grade = students[0][1]
+    max_grade = students[0][1]
+    total = 0
+    for name, grade in students:
+        if grade < min_grade:
+            min_grade = grade
+        if grade > max_grade:
+            max_grade = grade
+        total += grade
+    avg = round(total / len(students), 2)
+    return (min_grade, max_grade, avg)
+
+
+Задание 36. Множества: уникальные слова
+def unique_words(text):
+    result = []
+    for word in text.lower().split():
+        if word not in result:
+            result.append(word)
+    return result
+
+
+Задание 37. SQLite: полный CRUD для таблицы books
+import sqlite3
+
+DB_PATH = 'library.db'
+
+def add_book(title, author, year):
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO books (title, author, year) VALUES (?, ?, ?)', (title, author, year))
+        conn.commit()
+        return True
+    except sqlite3.Error:
+        conn.rollback()
+        return False
+    finally:
+        conn.close()
+
+def get_books_by_author(author):
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    try:
+        cursor = conn.cursor()
+        cursor.execute('SELECT id, title, year FROM books WHERE author = ?', (author,))
+        result = []
+        for row in cursor.fetchall():
+            result.append((row['id'], row['title'], row['year']))
+        return result
+    except sqlite3.Error:
+        conn.rollback()
+        return []
+    finally:
+        conn.close()
+
+def update_year(book_id, new_year):
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        cursor = conn.cursor()
+        cursor.execute('UPDATE books SET year = ? WHERE id = ?', (new_year, book_id))
+        conn.commit()
+        return cursor.rowcount
+    except sqlite3.Error:
+        conn.rollback()
+        return 0
+    finally:
+        conn.close()
+
+def delete_old_books(before_year):
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM books WHERE year < ?', (before_year,))
+        conn.commit()
+        return cursor.rowcount
+    except sqlite3.Error:
+        conn.rollback()
+        return 0
+    finally:
+        conn.close()
+
+
+Задание 38. Flask: маршрут «Фильтр по автору»
+from flask import Flask, render_template, request
+import sqlite3
+
+app = Flask(__name__)
+DB_PATH = 'library.db'
+
+@app.route('/books')
+def books():
+    author = request.args.get('author')
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        cursor = conn.cursor()
+        if author:
+            cursor.execute('SELECT id, title, author, year FROM books WHERE author = ?', (author,))
+        else:
+            cursor.execute('SELECT id, title, author, year FROM books')
+        rows = cursor.fetchall()
+    except sqlite3.Error as e:
+        conn.rollback()
+        return render_template('books.html', books=[], error=str(e))
+    finally:
+        conn.close()
+    return render_template('books.html', books=rows)
+
+
+Задание 39. Комплексная задача: «Топ-N авторов по количеству книг»
+def top_authors(books, n):
+    counts = {}
+    for title, author in books:
+        if author in counts:
+            counts[author] += 1
+        else:
+            counts[author] = 1
+    pairs = []
+    for author in counts:
+        pairs.append([author, counts[author]])
+    i = 0
+    while i < len(pairs):
+        j = 0
+        while j < len(pairs) - 1:
+            if pairs[j][1] < pairs[j + 1][1]:
+                temp = pairs[j]
+                pairs[j] = pairs[j + 1]
+                pairs[j + 1] = temp
+            elif pairs[j][1] == pairs[j + 1][1] and pairs[j][0] > pairs[j + 1][0]:
+                temp = pairs[j]
+                pairs[j] = pairs[j + 1]
+                pairs[j + 1] = temp
+            j += 1
+        i += 1
+    result = []
+    i = 0
+    while i < n and i < len(pairs):
+        result.append(pairs[i][0])
+        i += 1
+    return result
